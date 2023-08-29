@@ -5,7 +5,7 @@ import {
   getById,
   remove,
   update,
-  updateFavoriteStatus,
+  updateStatusContact,
 } from "../controller";
 
 const router = Router();
@@ -20,6 +20,6 @@ router.delete("/:contactId", remove);
 
 router.put("/:contactId", update);
 
-router.patch("/:contactId/favorite", updateFavoriteStatus);
+router.patch("/:contactId/favorite", updateStatusContact);
 
 export default router;

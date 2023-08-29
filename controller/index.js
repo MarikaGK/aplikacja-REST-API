@@ -111,13 +111,13 @@ const update = async (req, res, next) => {
   }
 };
 
-const updateFavoriteStatus = async (req, res, next) => {
+const updateStatusContact = async (req, res, next) => {
   const { id } = req.params;
   const { value, error } = favoriteBodySchema.validate(req.body);
   const { favorite } = value;
 
   if (error) {
-    res.status(400).json({ message: "Fill favorite status" });
+    res.status(400).json({ message: "missing field favorite" });
     return;
   }
 
@@ -168,4 +168,4 @@ const remove = async (req, res, next) => {
   }
 };
 
-export { get, getById, create, update, updateFavoriteStatus, remove };
+export { get, getById, create, update, updateStatusContact, remove };
