@@ -1,23 +1,23 @@
 import Contact from "./schemas/contact";
 
 const getAllContacts = async () => {
-  return Contact.find();
+  await Contact.find();
 };
 
 const getContactById = async (id) => {
-  return Contact.findOne({ _id: id });
+  await Contact.findOne({ _id: id });
 };
 
 const createContact = async ({ name, email, phone }) => {
-  return Contact.create({ name, email, phone });
+  await Contact.create({ name, email, phone });
 };
 
 const updateContact = async ({ id, fields }) => {
-  return Contact.findByIdAndUpdate({ _id: id }, fields, { new: true });
+  await Contact.findByIdAndUpdate({ _id: id }, fields, { new: true });
 };
 
 const removeContact = async (id) => {
-  return Contact.findByIdAndRemove({ _id: id });
+  await Contact.findByIdAndRemove({ _id: id });
 };
 
 export {
