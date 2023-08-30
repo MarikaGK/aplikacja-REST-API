@@ -2,13 +2,14 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import "dotenv/config";
-import router from "./api";
+import contactRouter from "./api/contact";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use("/api", router);
+app.use("/api", contactRouter);
+app.use("/users", )
 
 app.use((_, res, __) => {
   res.status(404).json({
