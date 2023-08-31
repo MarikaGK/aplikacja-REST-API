@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import "dotenv/config";
-import contactRouter from "./api/contact";
+import contactRouter from "./routes/contact.router";
 
 const app = express();
 

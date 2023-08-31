@@ -6,7 +6,7 @@ import {
   remove,
   update,
   updateStatusContact,
-} from "../controller/contact";
+} from "../controller/contact.controller";
 
 const contactRouter = Router();
 
