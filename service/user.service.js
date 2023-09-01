@@ -7,4 +7,8 @@ const findUserByEmail = async (email) => await User.findOne({ email });
 
 const findUserById = async (id) => await User.findOne({ _id: id });
 
-export { createUser, findUserByEmail, findUserById };
+const updateUserById = async (field, id) => {
+  await User.findByIdAndUpdate({ _id: id }, field, { new: true });
+};
+
+export { createUser, findUserByEmail, findUserById, updateUserById };
