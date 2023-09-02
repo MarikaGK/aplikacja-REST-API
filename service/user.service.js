@@ -11,4 +11,6 @@ const updateUserById = async (field, id) => {
   await User.findByIdAndUpdate({ _id: id }, field, { new: true });
 };
 
-export { createUser, findUserByEmail, findUserById, updateUserById };
+const findUserByToken = async token => await User.findOne({ token });
+
+export { createUser, findUserByEmail, findUserById, updateUserById, findUserByToken };
