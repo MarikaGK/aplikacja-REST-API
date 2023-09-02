@@ -132,19 +132,19 @@ const updateSubscriptionStatus = async (res, req, next) => {
   const { value, error } = subscriptionBodySchema.validate(req.body);
   const { subscription } = value;
   const { id } = req.user.id;
- 
+
   if (error) {
     res.status(400).json({ message: error.message });
     return;
   }
 
   try {
-await updateUserById({ subscription }, id);
-return res.json({
-  status: 'Success',
-  code: 200,
-  message: `User's subscription: ${subscription}.`,
-});
+    await updateUserById({ subscription }, id);
+    return res.json({
+      status: "Success",
+      code: 200,
+      message: `User's subscription: ${subscription}.`,
+    });
   } catch (e) {
     console.error(e);
     next(e);
