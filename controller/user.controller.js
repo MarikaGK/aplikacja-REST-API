@@ -3,10 +3,10 @@ import {
   findUserByEmail,
   findUserByToken,
   updateUserById,
-} from "../service/user.service";
+} from "../service/user.service.js";
 import Joi from "joi";
 import jwt from "jsonwebtoken";
-import { comparePassword, hashPassword } from "../service/password.service";
+import { comparePassword, hashPassword } from "../service/password.service.js";
 import "dotenv/config";
 
 const secret = process.env.SECRET;

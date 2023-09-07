@@ -2,14 +2,15 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import "dotenv/config";
-import contactRouter from "./routes/contact.router";
+import contactRouter from "./routes/contact.router.js";
+import userRouter from "./routes/user.router.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 app.use("/api", contactRouter);
-app.use("/users", )
+app.use("/users", userRouter)
 
 app.use((_, res, __) => {
   res.status(404).json({
@@ -34,8 +35,8 @@ const PORT = process.env.PORT || 3000;
 const uriDb = process.env.DB_HOST;
 
 const connection = mongoose.connect(uriDb, {
+  useNewUrlParser: true,
   useUnifiedTopology: true,
-  useFindAndModify: false,
 });
 
 connection

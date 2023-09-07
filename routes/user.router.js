@@ -5,8 +5,8 @@ import {
   login,
   logout,
   updateSubscriptionStatus,
-} from "../controller/user.controller";
-import auth from "../auth/user.auth";
+} from "../controller/user.controller.js";
+import auth from "../auth/user.auth.js";
 
 const userRouter = Router();
 
@@ -19,3 +19,5 @@ userRouter.get("/logout", auth, logout);
 userRouter.get("/current", auth, getCurrent);
 
 userRouter.patch("/", auth, updateSubscriptionStatus);
+
+export default userRouter

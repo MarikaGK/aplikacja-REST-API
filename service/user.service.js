@@ -1,4 +1,4 @@
-import User from "./schemas/user.schema";
+import User from "./schemas/user.schema.js";
 
 const createUser = async ({ email, password }) =>
   await User.create({ email, password });
