@@ -18,6 +18,7 @@ const favoriteBodySchema = Joi.object({
 });
 
 const get = async (req, res, next) => {
+  const owner = req.user.id;
   try {
     const results = await getAllContacts();
     res.json({
@@ -34,9 +35,11 @@ const get = async (req, res, next) => {
 };
 
 const getById = async (req, res, next) => {
-  const { id } = req.params;
+  const { contactId } = req.params;
+  const owner = req.user.id;
   try {
-    const result = await getContactById(id);
+    const result = await getContactById(contactId, owner);
+    console.log(result);
     if (result) {
       res.json({
         status: "success",
@@ -47,7 +50,7 @@ const getById = async (req, res, next) => {
       res.status(404).json({
         status: "error",
         code: 404,
-        message: `Not found contact id: ${id}`,
+        message: `Not found contact id: ${contactId}`,
         data: "Not Found",
       });
     }
@@ -58,16 +61,18 @@ const getById = async (req, res, next) => {
 };
 
 const create = async (req, res, next) => {
+  const owner = req.user.id;
   const { value, error } = contactBodySchema.validate(req.body);
   const { name, email, phone } = value;
-
+  
   if (error) {
     res.status(400).json({ message: error.message });
     return;
   }
-
+  
   try {
-    const result = await createContact({ name, email, phone });
+    const result = await createContact({ name, email, phone, owner });
+    
     res.status(201).json({
       status: "success",
       code: 201,
@@ -80,17 +85,18 @@ const create = async (req, res, next) => {
 };
 
 const update = async (req, res, next) => {
-  const { id } = req.params;
+  const owner = req.user.id;
+  const { contactId } = req.params;
   const { value, error } = contactBodySchema.validate(req.body);
   const { name, email, phone } = value;
-
+  
   if (error) {
     res.status(400).json({ message: error.message });
     return;
   }
-
+  
   try {
-    const result = await updateContact({ name, email, phone });
+    const result = await updateContact(contactId, { name, email, phone, owner, favorite });
     if (result) {
       res.json({
         status: "success",
@@ -101,7 +107,7 @@ const update = async (req, res, next) => {
       res.status(404).json({
         status: "error",
         code: 404,
-        message: `Not found contact id: ${id}`,
+        message: `Not found contact id: ${contactId}`,
         data: "Not Found",
       });
     }
@@ -112,17 +118,18 @@ const update = async (req, res, next) => {
 };
 
 const updateStatusContact = async (req, res, next) => {
-  const { id } = req.params;
+  const owner = req.user.id;
+  const { contactId } = req.params;
   const { value, error } = favoriteBodySchema.validate(req.body);
   const { favorite } = value;
-
+  
   if (error) {
     res.status(400).json({ message: "missing field favorite" });
     return;
   }
-
+  
   try {
-    const result = await updateContact(id, { favorite });
+    const result = await updateContact(contactId, owner, { favorite });
     if (result) {
       res.json({
         status: "success",
@@ -133,7 +140,7 @@ const updateStatusContact = async (req, res, next) => {
       res.status(404).json({
         status: "error",
         code: 404,
-        message: `Not found contact id: ${id}`,
+        message: `Not found contact id: ${contactId}`,
         data: "Not Found",
       });
     }
@@ -144,10 +151,10 @@ const updateStatusContact = async (req, res, next) => {
 };
 
 const remove = async (req, res, next) => {
-  const { id } = req.params;
-
+  const owner = req.user.id;
+  const { contactId } = req.params;
   try {
-    const result = await removeContact(id);
+    const result = await removeContact(contactId, owner);
     if (result) {
       res.json({
         status: "success",
@@ -158,7 +165,7 @@ const remove = async (req, res, next) => {
       res.status(404).json({
         status: "error",
         code: 404,
-        message: `Not found contact id: ${id}`,
+        message: `Not found contact id: ${contactId}`,
         data: "Not Found",
       });
     }

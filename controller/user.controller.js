@@ -12,7 +12,7 @@ import "dotenv/config";
 const secret = process.env.SECRET;
 
 const userBodySchema = Joi.object({
-  email: Joi.string().email({ maxDomainSegments: 2 }).required(),
+  email: Joi.string().email({ maxDomainSegments: 3 }).required(),
   password: Joi.string().min(8).required(),
 });
 
@@ -20,7 +20,7 @@ const subscriptionBodySchema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business").required(),
 });
 
-const create = async (res, req, next) => {
+const create = async (req, res, next) => {
   const { value, error } = userBodySchema.validate(req.body);
   const { email, password } = value;
 
@@ -37,8 +37,8 @@ const create = async (res, req, next) => {
       res.status(409).json({ message: "Email in use" });
       return;
     }
-    const hashedPassword = hashPassword(password);
-    await createUser({ normalizedEmail, hashedPassword });
+    const hashedPassword = await hashPassword(password);
+    await createUser(normalizedEmail, hashedPassword);
     res.status(201).json({
       status: "success",
       code: 201,
@@ -55,7 +55,7 @@ const create = async (res, req, next) => {
   }
 };
 
-const login = async (res, req, __) => {
+const login = async (req, res, __) => {
   const { value, error } = userBodySchema.validate(req.body);
   const { email, password } = value;
 
@@ -79,7 +79,7 @@ const login = async (res, req, __) => {
     };
     const token = jwt.sign(payload, secret, { expiresIn: "1h" });
 
-    await updateUserById({ token }, user.id);
+    await updateUserById(user.id, { token });
 
     res.json({
       token: token,
@@ -93,11 +93,11 @@ const login = async (res, req, __) => {
   }
 };
 
-const logout = async (res, req, __) => {
+const logout = async (req, res, __) => {
   try {
     const id = req.user.id;
     const token = null;
-    await updateUserById({ token }, id);
+    await updateUserById(id, { token });
     return res.json({
       status: "Success",
       code: 200,
@@ -108,7 +108,7 @@ const logout = async (res, req, __) => {
   }
 };
 
-const getCurrent = async (res, req, __) => {
+const getCurrent = async (req, res, __) => {
   try {
     const token = req.user.token;
     const user = await findUserByToken(token);
@@ -128,7 +128,7 @@ const getCurrent = async (res, req, __) => {
   }
 };
 
-const updateSubscriptionStatus = async (res, req, next) => {
+const updateSubscriptionStatus = async (req, res, next) => {
   const { value, error } = subscriptionBodySchema.validate(req.body);
   const { subscription } = value;
   const { id } = req.user.id;
@@ -139,7 +139,7 @@ const updateSubscriptionStatus = async (res, req, next) => {
   }
 
   try {
-    await updateUserById({ subscription }, id);
+    await updateUserById(id, { subscription });
     return res.json({
       status: "Success",
       code: 200,

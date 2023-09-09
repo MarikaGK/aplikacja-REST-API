@@ -1,16 +1,22 @@
 import User from "./schemas/user.schema.js";
 
-const createUser = async ({ email, password }) =>
-  await User.create({ email, password });
+const createUser = (email, password) =>
+{ return new User({ email, password }).save()};
 
-const findUserByEmail = async (email) => await User.findOne({ email });
+const findUserByEmail = (email) => { return User.findOne({ email })};
 
-const findUserById = async (id) => await User.findOne({ _id: id });
+const findUserById = (id) => { return User.findOne({ _id: id })};
 
-const updateUserById = async (field, id) => {
-  await User.findByIdAndUpdate({ _id: id }, field, { new: true });
+const updateUserById = (id, field) => {
+ return User.findByIdAndUpdate({ _id: id }, field, { new: true });
 };
 
-const findUserByToken = async token => await User.findOne({ token });
+const findUserByToken = (token) => { return User.findOne({ token })};
 
-export { createUser, findUserByEmail, findUserById, updateUserById, findUserByToken };
+export {
+  createUser,
+  findUserByEmail,
+  findUserById,
+  updateUserById,
+  findUserByToken,
+};

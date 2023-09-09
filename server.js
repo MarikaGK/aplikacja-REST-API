@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use("/api", contactRouter);
-app.use("/users", userRouter)
+app.use("/users", userRouter);
 
 app.use((_, res, __) => {
   res.status(404).json({
@@ -35,6 +35,7 @@ const PORT = process.env.PORT || 3000;
 const uriDb = process.env.DB_HOST;
 
 const connection = mongoose.connect(uriDb, {
+  dbName: "db-contacts",
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -45,6 +46,6 @@ connection
       console.log(`Server running. Use our API on port: ${PORT}`);
     });
   })
-  .catch(err =>
-    console.log(`Server not running. Error message: ${err.message}`),
+  .catch((err) =>
+    console.log(`Server not running. Error message: ${err.message}`)
   );
