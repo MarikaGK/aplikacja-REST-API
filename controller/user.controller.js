@@ -8,6 +8,11 @@ import Joi from "joi";
 import jwt from "jsonwebtoken";
 import { comparePassword, hashPassword } from "../service/password.service.js";
 import "dotenv/config";
+import generateAvatar from "../utils/avatar/avatar.generator.js";
+import createFilePath from "../utils/create.filePath.js";
+import { AVATAR_DIR, TEMP_DIR } from "../utils/avatar/avatar.variables.js";
+import { relocateFile, removeFile } from "../utils/handle.file.js";
+import optimizeAvatar from "../utils/avatar/avatar.optimizer.js";
 
 const secret = process.env.SECRET;
 
@@ -38,7 +43,8 @@ const create = async (req, res, next) => {
       return;
     }
     const hashedPassword = await hashPassword(password);
-    await createUser(normalizedEmail, hashedPassword);
+    const avatarURL = generateAvatar(normalizedEmail);
+    await createUser(normalizedEmail, hashedPassword, avatarURL);
     res.status(201).json({
       status: "success",
       code: 201,
@@ -151,4 +157,38 @@ const updateSubscriptionStatus = async (req, res, next) => {
   }
 };
 
-export { create, login, logout, getCurrent, updateSubscriptionStatus };
+const updateAvatar = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { path: originalPath, originalName } = req.file;
+    const temporaryPath = createFilePath(TEMP_DIR, originalName);
+    const targetPath = createFilePath(AVATAR_DIR, originalName);
+    await relocateFile(originalPath, temporaryPath);
+    await optimizeAvatar(temporaryPath, targetPath);
+    await removeFile(temporaryPath);
+    await updateUserById(userId, { avatarURL: targetPath });
+    return res.json({
+      status: "success",
+      code: 200,
+      message: "New avatar added successfully.",
+      avatarURL: targetPath,
+    });
+  } catch (err) {
+    console.error(err);
+    next(err);
+    return res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Server error",
+    });
+  }
+};
+
+export {
+  create,
+  login,
+  logout,
+  getCurrent,
+  updateSubscriptionStatus,
+  updateAvatar,
+};

@@ -4,6 +4,7 @@ import {
   getCurrent,
   login,
   logout,
+  updateAvatar,
   updateSubscriptionStatus,
 } from "../controller/user.controller.js";
 import auth from "../auth/user.auth.js";
@@ -20,4 +21,6 @@ userRouter.get("/current", auth, getCurrent);
 
 userRouter.patch("/", auth, updateSubscriptionStatus);
 
-export default userRouter
+userRouter.patch("/avatars", auth, updateAvatar);
+
+export default userRouter;
