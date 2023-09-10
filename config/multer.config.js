@@ -1,6 +1,9 @@
 import path from "node:path";
 import multer from "multer";
-import { AVATAR_DIR, AVATAR_MAX_SIZE } from "../utils/avatar/avatar.variables";
+import {
+  AVATAR_DIR,
+  AVATAR_MAX_SIZE,
+} from "../utils/avatar/avatar.variables.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

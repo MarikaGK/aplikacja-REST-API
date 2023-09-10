@@ -159,6 +159,7 @@ const updateSubscriptionStatus = async (req, res, next) => {
 
 const updateAvatar = async (req, res, next) => {
   try {
+    console.log(req)
     const userId = req.user.id;
     const { path: originalPath, originalName } = req.file;
     const temporaryPath = createFilePath(TEMP_DIR, originalName);
@@ -175,7 +176,6 @@ const updateAvatar = async (req, res, next) => {
     });
   } catch (err) {
     console.error(err);
-    next(err);
     return res.status(500).json({
       status: "error",
       code: 500,

@@ -8,6 +8,7 @@ import {
   updateSubscriptionStatus,
 } from "../controller/user.controller.js";
 import auth from "../auth/user.auth.js";
+import upload from "../config/multer.config.js";
 
 const userRouter = Router();
 
@@ -21,6 +22,6 @@ userRouter.get("/current", auth, getCurrent);
 
 userRouter.patch("/", auth, updateSubscriptionStatus);
 
-userRouter.patch("/avatars", auth, updateAvatar);
+userRouter.patch("/avatars", upload.single("avatar"), updateAvatar);
 
 export default userRouter;
