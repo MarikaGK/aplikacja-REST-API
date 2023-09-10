@@ -3,16 +3,21 @@ import {
   findUserByEmail,
   findUserByToken,
   updateUserById,
-} from "../service/user.service";
+} from "../service/user.service.js";
 import Joi from "joi";
 import jwt from "jsonwebtoken";
-import { comparePassword, hashPassword } from "../service/password.service";
+import { comparePassword, hashPassword } from "../service/password.service.js";
 import "dotenv/config";
+import generateAvatar from "../utils/avatar/avatar.generator.js";
+import createFilePath from "../utils/create.filePath.js";
+import { AVATAR_DIR, TEMP_DIR } from "../utils/avatar/avatar.variables.js";
+import { relocateFile, removeFile } from "../utils/handle.file.js";
+import optimizeAvatar from "../utils/avatar/avatar.optimizer.js";
 
 const secret = process.env.SECRET;
 
 const userBodySchema = Joi.object({
-  email: Joi.string().email({ maxDomainSegments: 2 }).required(),
+  email: Joi.string().email({ maxDomainSegments: 3 }).required(),
   password: Joi.string().min(8).required(),
 });
 
@@ -20,7 +25,7 @@ const subscriptionBodySchema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business").required(),
 });
 
-const create = async (res, req, next) => {
+const create = async (req, res, next) => {
   const { value, error } = userBodySchema.validate(req.body);
   const { email, password } = value;
 
@@ -37,8 +42,9 @@ const create = async (res, req, next) => {
       res.status(409).json({ message: "Email in use" });
       return;
     }
-    const hashedPassword = hashPassword(password);
-    await createUser({ normalizedEmail, hashedPassword });
+    const hashedPassword = await hashPassword(password);
+    const avatarURL = generateAvatar(normalizedEmail);
+    await createUser(normalizedEmail, hashedPassword, avatarURL);
     res.status(201).json({
       status: "success",
       code: 201,
@@ -55,7 +61,7 @@ const create = async (res, req, next) => {
   }
 };
 
-const login = async (res, req, __) => {
+const login = async (req, res, __) => {
   const { value, error } = userBodySchema.validate(req.body);
   const { email, password } = value;
 
@@ -79,7 +85,7 @@ const login = async (res, req, __) => {
     };
     const token = jwt.sign(payload, secret, { expiresIn: "1h" });
 
-    await updateUserById({ token }, user.id);
+    await updateUserById(user.id, { token });
 
     res.json({
       token: token,
@@ -93,11 +99,11 @@ const login = async (res, req, __) => {
   }
 };
 
-const logout = async (res, req, __) => {
+const logout = async (req, res, __) => {
   try {
     const id = req.user.id;
     const token = null;
-    await updateUserById({ token }, id);
+    await updateUserById(id, { token });
     return res.json({
       status: "Success",
       code: 200,
@@ -108,7 +114,7 @@ const logout = async (res, req, __) => {
   }
 };
 
-const getCurrent = async (res, req, __) => {
+const getCurrent = async (req, res, __) => {
   try {
     const token = req.user.token;
     const user = await findUserByToken(token);
@@ -128,7 +134,7 @@ const getCurrent = async (res, req, __) => {
   }
 };
 
-const updateSubscriptionStatus = async (res, req, next) => {
+const updateSubscriptionStatus = async (req, res, next) => {
   const { value, error } = subscriptionBodySchema.validate(req.body);
   const { subscription } = value;
   const { id } = req.user.id;
@@ -139,7 +145,7 @@ const updateSubscriptionStatus = async (res, req, next) => {
   }
 
   try {
-    await updateUserById({ subscription }, id);
+    await updateUserById(id, { subscription });
     return res.json({
       status: "Success",
       code: 200,
@@ -151,4 +157,38 @@ const updateSubscriptionStatus = async (res, req, next) => {
   }
 };
 
-export { create, login, logout, getCurrent, updateSubscriptionStatus };
+const updateAvatar = async (req, res, next) => {
+  try {
+    console.log(req)
+    const userId = req.user.id;
+    const { path: originalPath, originalName } = req.file;
+    const temporaryPath = createFilePath(TEMP_DIR, originalName);
+    const targetPath = createFilePath(AVATAR_DIR, originalName);
+    await relocateFile(originalPath, temporaryPath);
+    await optimizeAvatar(temporaryPath, targetPath);
+    await removeFile(temporaryPath);
+    await updateUserById(userId, { avatarURL: targetPath });
+    return res.json({
+      status: "success",
+      code: 200,
+      message: "New avatar added successfully.",
+      avatarURL: targetPath,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Server error",
+    });
+  }
+};
+
+export {
+  create,
+  login,
+  logout,
+  getCurrent,
+  updateSubscriptionStatus,
+  updateAvatar,
+};
