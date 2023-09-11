@@ -179,7 +179,6 @@ const updateSubscriptionStatus = async (req, res, next) => {
 
 const updateAvatar = async (req, res, next) => {
   try {
-    console.log(req);
     const userId = req.user.id;
     const { path: originalPath, originalName } = req.file;
     const temporaryPath = createFilePath(TEMP_DIR, originalName);
@@ -258,7 +257,7 @@ const sendVerificationToken = async (req, res, next) => {
       message: "Verification email sent",
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(500).json({
       status: "error",
       code: 500,

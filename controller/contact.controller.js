@@ -39,7 +39,6 @@ const getById = async (req, res, next) => {
   const owner = req.user.id;
   try {
     const result = await getContactById(contactId, owner);
-    console.log(result);
     if (result) {
       res.json({
         status: "success",
