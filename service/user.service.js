@@ -1,7 +1,8 @@
+import { token } from "morgan";
 import User from "./schemas/user.schema.js";
 
-const createUser = (email, password, avatarURL) => {
-  return new User({ email, password, avatarURL }).save();
+const createUser = (email, password, avatarURL, verificationToken) => {
+  return new User({ email, password, avatarURL, verificationToken }).save();
 };
 
 const findUserByEmail = (email) => {
@@ -20,10 +21,15 @@ const findUserByToken = (token) => {
   return User.findOne({ token });
 };
 
+const findUserByVerificationToken = (verificationToken) => {
+  return User.findOne({ verificationToken });
+};
+
 export {
   createUser,
   findUserByEmail,
   findUserById,
   updateUserById,
   findUserByToken,
+  findUserByVerificationToken,
 };

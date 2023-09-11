@@ -4,6 +4,8 @@ import {
   getCurrent,
   login,
   logout,
+  sendVerificationToken,
+  submitVerification,
   updateAvatar,
   updateSubscriptionStatus,
 } from "../controller/user.controller.js";
@@ -22,6 +24,10 @@ userRouter.get("/current", auth, getCurrent);
 
 userRouter.patch("/", auth, updateSubscriptionStatus);
 
-userRouter.patch("/avatars", upload.single("avatar"), updateAvatar);
+userRouter.patch("/avatars", auth, upload.single("avatar"), updateAvatar);
+
+userRouter.get("/verify/:verificationToken", submitVerification);
+
+userRouter.post("/verify", sendVerificationToken);
 
 export default userRouter;
