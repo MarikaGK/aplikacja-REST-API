@@ -1,24 +1,24 @@
-import passport from "passport";
+import passport from 'passport';
 
-const auth = (req, res, next) => {
-  passport.authenticate("jwt", { session: false }, (err, user) => {
-    if (!req.get("Authorization")) {
+const auth = async (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
+    if (!req.get('Authorization')) {
       return res.status(401).json({
-        status: "error",
+        status: 'error',
         code: 401,
-        message: "Not authorized",
-        data: "Unauthorized",
+        message: 'Not authorized',
+        data: 'Unauthorized',
       });
     }
 
-    const token = req.get("Authorization").replace("Bearer ", "");
+    const token = req.get('Authorization').replace('Bearer ', '');
 
     if (!user || err || !token || token !== user.token) {
       return res.status(401).json({
-        status: "error",
+        status: 'error',
         code: 401,
-        message: "Not authorized",
-        data: "Unauthorized",
+        message: 'Not authorized',
+        data: 'Unauthorized',
       });
     }
 
