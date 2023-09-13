@@ -7,7 +7,7 @@ import {
 } from "../service/user.service.js";
 import Joi from "joi";
 import jwt from "jsonwebtoken";
-import { comparePassword, hashPassword } from "../service/password.service.js";
+import { comparePassword, hashPassword } from "../utils/password.hashing.js";
 import "dotenv/config";
 import generateAvatar from "../utils/avatar/avatar.generator.js";
 import createFilePath from "../utils/create.filePath.js";
